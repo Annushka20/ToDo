@@ -1,35 +1,58 @@
 import React, { useState } from "react";
-const ToDos = ({todo,remove,changeTodo}) => {
 
-    const[open,setOpen] = useState(true)
-    const [editText, seteditText] = useState(todo.title);
+const ToDos = ({todo, dispatch}) => {
+    const [open, setOpen] = useState(true);
+    const [editText, setEditText] = useState(todo.title);
 
-    const Blur = () => {
+    const handleBlur = () => {
         setOpen(true);
-        if(editText !== todo.title){
-            todo.title == editText;
+        if (editText !== todo.title) {
+            dispatch({
+                type: "UPDATE_TODO",
+                payload: { id: todo.id, title: editText }
+            });
         }
     };
 
-    const PressBtn = (e) =>{
-        if(e.key == 'Enter'){
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
             setOpen(true);
-            if(editText !== todo.title){
-                todo.title = editText;
+            if (editText !== todo.title) {
+                dispatch({
+                    type: "UPDATE_TODO",
+                    payload: { id: todo.id, title: editText }
+                });
             }
         }
     };
 
-    return(
+    return (
         <li key={todo.id}>
-                <input className='input' type={'checkbox'} checked ={todo.isDone} onChange={() => changeTodo(todo.id)}/>
-                {
-                    open ?
-                    <span onDoubleClick={()=>setOpen(false)}>{todo.title}{todo.text}</span>: <input value={editText} onChange={(e)=> seteditText(e.target.value)} onBlur={Blur} onKeyPress={PressBtn}/> 
-                }
-                <button className="btn 1" onClick= {() => remove(todo.id)}>X</button>
-              </li>
+            <input 
+                className='input' 
+                type={'checkbox'} 
+                checked={todo.isDone} 
+                onChange={() => dispatch({type: "TOGGLE_TODO", payload: todo.id})}
+            />
+            {
+                open ? (
+                    <span onDoubleClick={() => setOpen(false)}>
+                        {todo.title}
+                    </span>
+                ) : (
+                    <input 
+                        value={editText} 
+                        onChange={(e) => setEditText(e.target.value)} 
+                        onBlur={handleBlur} 
+                        onKeyPress={handleKeyPress}
+                    />
+                )
+            }
+            <button className="btn 1" onClick={() => dispatch({type: "REMOVE_TODO", payload: todo.id})}>
+                X
+            </button>
+        </li>
     )
 }
 
-export default ToDos
+export default ToDos;
